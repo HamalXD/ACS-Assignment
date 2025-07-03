@@ -40,7 +40,7 @@ A comprehensive React-based user registration and authentication system that imp
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd secure-user-registration-system
+   cd ACS-Assignment
    ```
 
 2. **Install dependencies**
