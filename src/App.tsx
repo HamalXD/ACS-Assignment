@@ -1,8 +1,7 @@
-import { useState } from 'react';
-import RegistrationForm from './components/RegistrationForm';
-import SecurityFeatures from './components/SecurityFeatures';
-import LoginForm from './components/LoginForm';
-import Dashboard from './components/Dashboard';
+import { useState } from "react";
+import RegistrationForm from "./components/RegistrationForm";
+import LoginForm from "./components/LoginForm";
+import Dashboard from "./components/Dashboard";
 
 interface User {
   username: string;
@@ -12,13 +11,13 @@ interface User {
   passwordHistory: string[];
 }
 
-type Page = 'register' | 'login' | 'dashboard';
+type Page = "register" | "login" | "dashboard";
 
 function App() {
   const [users, setUsers] = useState<User[]>([]);
-  const [registrationStatus, setRegistrationStatus] = useState('');
+  const [registrationStatus, setRegistrationStatus] = useState("");
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [page, setPage] = useState<Page>('login');
+  const [page, setPage] = useState<Page>("login");
 
   const handleRegistration = (userData: {
     username: string;
@@ -31,24 +30,24 @@ function App() {
       passwordHash: userData.passwordHash,
       salt: userData.salt,
       lastPasswordChange: new Date(),
-      passwordHistory: [userData.passwordHash]
+      passwordHistory: [userData.passwordHash],
     };
     setUsers([...users, newUser]);
-    setRegistrationStatus('Account created successfully! You can now log in.');
-    setPage('login');
+    setRegistrationStatus("Account created successfully! You can now log in.");
+    setPage("login");
     setTimeout(() => {
-      setRegistrationStatus('');
+      setRegistrationStatus("");
     }, 5000);
   };
 
   const handleLogin = (user: User) => {
     setCurrentUser(user);
-    setPage('dashboard');
+    setPage("dashboard");
   };
 
   const handleLogout = () => {
     setCurrentUser(null);
-    setPage('login');
+    setPage("login");
   };
 
   return (
@@ -63,14 +62,14 @@ function App() {
           </p>
         </div>
 
-        {page === 'register' && (
+        {page === "register" && (
           <>
             <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
               <RegistrationForm onSubmit={handleRegistration} users={users} />
               <div className="mt-4 text-center">
                 <button
                   className="text-blue-600 hover:underline"
-                  onClick={() => setPage('login')}
+                  onClick={() => setPage("login")}
                 >
                   Already have an account? Login
                 </button>
@@ -81,18 +80,17 @@ function App() {
                 {registrationStatus}
               </div>
             )}
-            <SecurityFeatures />
           </>
         )}
 
-        {page === 'login' && !currentUser && (
+        {page === "login" && !currentUser && (
           <>
             <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
               <LoginForm users={users} onLogin={handleLogin} />
               <div className="mt-4 text-center">
                 <button
                   className="text-blue-600 hover:underline"
-                  onClick={() => setPage('register')}
+                  onClick={() => setPage("register")}
                 >
                   Don&apos;t have an account? Register
                 </button>
@@ -103,12 +101,15 @@ function App() {
                 {registrationStatus}
               </div>
             )}
-            <SecurityFeatures />
           </>
         )}
 
-        {page === 'dashboard' && currentUser && (
-          <Dashboard users={users} currentUser={currentUser} onLogout={handleLogout} />
+        {page === "dashboard" && currentUser && (
+          <Dashboard
+            users={users}
+            currentUser={currentUser}
+            onLogout={handleLogout}
+          />
         )}
       </div>
     </div>
