@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 interface CaptchaProps {
   onGenerate: (captcha: string) => void;
@@ -6,12 +6,16 @@ interface CaptchaProps {
   height?: number;
 }
 
-const Captcha: React.FC<CaptchaProps> = ({ onGenerate, width = 200, height = 60 }) => {
-  const [captchaText, setCaptchaText] = useState('');
+const Captcha: React.FC<CaptchaProps> = ({
+  onGenerate,
+  width = 200,
+  height = 60,
+}) => {
+  const [captchaText, setCaptchaText] = useState("");
 
   const generateCaptcha = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let result = '';
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let result = "";
     for (let i = 0; i < 6; i++) {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
@@ -29,25 +33,29 @@ const Captcha: React.FC<CaptchaProps> = ({ onGenerate, width = 200, height = 60 
     const canvas = canvasRef.current;
     if (!canvas || !captchaText) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     // Clear canvas
     ctx.clearRect(0, 0, width, height);
 
     // Background
-    ctx.fillStyle = '#f3f4f6';
+    ctx.fillStyle = "#f3f4f6";
     ctx.fillRect(0, 0, width, height);
 
     // Add noise
     for (let i = 0; i < 50; i++) {
-      ctx.fillStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.1)`;
+      ctx.fillStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${
+        Math.random() * 255
+      }, 0.1)`;
       ctx.fillRect(Math.random() * width, Math.random() * height, 2, 2);
     }
 
     // Add lines
     for (let i = 0; i < 3; i++) {
-      ctx.strokeStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.3)`;
+      ctx.strokeStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${
+        Math.random() * 255
+      }, 0.3)`;
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(Math.random() * width, Math.random() * height);
@@ -56,14 +64,14 @@ const Captcha: React.FC<CaptchaProps> = ({ onGenerate, width = 200, height = 60 
     }
 
     // Draw text
-    ctx.font = 'bold 24px Arial';
-    ctx.fillStyle = '#1f2937';
-    
+    ctx.font = "bold 24px Arial";
+    ctx.fillStyle = "#1f2937";
+
     for (let i = 0; i < captchaText.length; i++) {
       const x = 20 + i * 28;
       const y = 35 + Math.random() * 10 - 5;
       const rotation = (Math.random() - 0.5) * 0.4;
-      
+
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(rotation);
@@ -93,4 +101,4 @@ const Captcha: React.FC<CaptchaProps> = ({ onGenerate, width = 200, height = 60 
   );
 };
 
-export default Captcha; 
+export default Captcha;

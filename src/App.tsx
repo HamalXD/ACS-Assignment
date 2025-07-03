@@ -1,7 +1,15 @@
-import { useState } from "react";
-import RegistrationForm from "./components/RegistrationForm";
-import LoginForm from "./components/LoginForm";
-import Dashboard from "./components/Dashboard";
+import { useState, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import DashboardPage from "./pages/DashboardPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 interface User {
   username: string;
@@ -11,13 +19,24 @@ interface User {
   passwordHistory: string[];
 }
 
-type Page = "register" | "login" | "dashboard";
-
-function App() {
+function AppContent() {
   const [users, setUsers] = useState<User[]>([]);
   const [registrationStatus, setRegistrationStatus] = useState("");
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [page, setPage] = useState<Page>("login");
+  const navigate = useNavigate();
+
+  // Load users from localStorage on component mount
+  useEffect(() => {
+    const savedUsers = localStorage.getItem("users");
+    if (savedUsers) {
+      setUsers(JSON.parse(savedUsers));
+    }
+  }, []);
+
+  // Save users to localStorage whenever users state changes
+  useEffect(() => {
+    localStorage.setItem("users", JSON.stringify(users));
+  }, [users]);
 
   const handleRegistration = (userData: {
     username: string;
@@ -34,7 +53,7 @@ function App() {
     };
     setUsers([...users, newUser]);
     setRegistrationStatus("Account created successfully! You can now log in.");
-    setPage("login");
+    navigate("/login");
     setTimeout(() => {
       setRegistrationStatus("");
     }, 5000);
@@ -42,77 +61,52 @@ function App() {
 
   const handleLogin = (user: User) => {
     setCurrentUser(user);
-    setPage("dashboard");
+    navigate("/dashboard");
   };
 
   const handleLogout = () => {
     setCurrentUser(null);
-    setPage("login");
+    navigate("/login");
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            Secure User Registration System
-          </h1>
-          <p className="text-lg text-gray-600">
-            Implementing Cybersecurity Best Practices
-          </p>
-        </div>
-
-        {page === "register" && (
-          <>
-            <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
-              <RegistrationForm onSubmit={handleRegistration} users={users} />
-              <div className="mt-4 text-center">
-                <button
-                  className="text-blue-600 hover:underline"
-                  onClick={() => setPage("login")}
-                >
-                  Already have an account? Login
-                </button>
-              </div>
-            </div>
-            {registrationStatus && (
-              <div className="p-4 rounded-lg mb-6 bg-green-50 border border-green-200 text-green-800">
-                {registrationStatus}
-              </div>
-            )}
-          </>
-        )}
-
-        {page === "login" && !currentUser && (
-          <>
-            <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
-              <LoginForm users={users} onLogin={handleLogin} />
-              <div className="mt-4 text-center">
-                <button
-                  className="text-blue-600 hover:underline"
-                  onClick={() => setPage("register")}
-                >
-                  Don&apos;t have an account? Register
-                </button>
-              </div>
-            </div>
-            {registrationStatus && (
-              <div className="p-4 rounded-lg mb-6 bg-green-50 border border-green-200 text-green-800">
-                {registrationStatus}
-              </div>
-            )}
-          </>
-        )}
-
-        {page === "dashboard" && currentUser && (
-          <Dashboard
+    <Routes>
+      <Route
+        path="/login"
+        element={
+          <LoginPage
             users={users}
-            currentUser={currentUser}
-            onLogout={handleLogout}
+            onLogin={handleLogin}
+            registrationStatus={registrationStatus}
           />
-        )}
-      </div>
-    </div>
+        }
+      />
+      <Route
+        path="/register"
+        element={<RegisterPage users={users} onSubmit={handleRegistration} />}
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute currentUser={currentUser}>
+            <DashboardPage
+              users={users}
+              currentUser={currentUser!}
+              onLogout={handleLogout}
+            />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/" element={<Navigate to="/login" replace />} />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
   );
 }
 
